@@ -26,10 +26,17 @@ app.get("/", (req, res) => {
 app.post("/upload", upload.single("audio"), (req, res) => {
   const { agentName, notes } = req.body;
 
+  // Mock AI analysis text
   const mockAnalysis = `Call by ${agentName || "Unknown"}.
-- Talk ratio: 60% / 40% (simulated)
+- Talk ratio: 60% agent / 40% prospect (simulated)
 - Objection handling: Needs improvement
-- Coaching: Ask more open-ended questions and confirm next steps.`;
+- Coaching: Ask more open-ended questions and confirm next steps clearly.`;
+
+  // Mock quality score & sentiment for now
+  const qualityScore = Math.floor(60 + Math.random() * 40); // 60–99
+  let sentiment = "Needs Improvement";
+  if (qualityScore >= 85) sentiment = "Positive";
+  else if (qualityScore >= 75) sentiment = "Neutral";
 
   const callRecord = {
     id: calls.length + 1,
@@ -37,7 +44,10 @@ app.post("/upload", upload.single("audio"), (req, res) => {
     notes: notes || "",
     filename: req.file ? req.file.originalname : "No file",
     analysis: mockAnalysis,
-    createdAt: new Date().toISOString()
+    qualityScore,
+    sentiment,
+    source: "Upload", // later: Yeastar / Meet etc.
+    createdAt: new Date().toISOString(),
   };
 
   calls.unshift(callRecord);
