@@ -2,582 +2,720 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>SalesAI CallCoach</title>
+    <title>SalesAI Coach</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       :root {
-        --bg-dark: #020617;
-        --bg-surface: #020617;
-        --bg-card: #0b1120;
-        --bg-sidebar: #020617;
-        --accent: #4f46e5;
-        --accent-soft: rgba(79, 70, 229, 0.15);
-        --text-main: #f9fafb;
+        --bg: #020617;
+        --bg-elevated: #0b1220;
+        --border-subtle: #1e293b;
+        --primary: #6366f1;
+        --primary-soft: rgba(99, 102, 241, 0.12);
+        --text: #e5e7eb;
         --text-muted: #9ca3af;
-        --border-subtle: #1f2937;
+        --danger: #f97373;
+        --positive: #4ade80;
+        --warning: #facc15;
       }
+
       * {
         box-sizing: border-box;
       }
+
       body {
         margin: 0;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-          "Segoe UI", sans-serif;
-        background: radial-gradient(circle at top, #111827 0, #020617 50%);
-        color: var(--text-main);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: radial-gradient(circle at top, #111827, #020617);
+        color: var(--text);
       }
-      .layout {
+
+      .app-shell {
         display: flex;
         min-height: 100vh;
       }
+
+      /* Sidebar */
       .sidebar {
-        width: 260px;
-        background: var(--bg-sidebar);
+        width: 240px;
+        background: linear-gradient(180deg, #020617, #020617, #020617);
         border-right: 1px solid var(--border-subtle);
-        padding: 20px 18px;
+        padding: 16px 14px;
         display: flex;
         flex-direction: column;
       }
+
       .logo {
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 26px;
+        gap: 8px;
+        margin-bottom: 22px;
       }
-      .logo-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, #4f46e5, #22c55e);
+
+      .logo-mark {
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 20%, #4f46e5, #22c55e);
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
         font-size: 18px;
       }
+
       .logo-text {
-        font-size: 18px;
         font-weight: 600;
+        font-size: 17px;
       }
+
       .nav-section-title {
-        font-size: 12px;
+        font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: var(--text-muted);
-        margin: 12px 6px 8px;
-      }
-      .nav-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 10px;
-        margin: 2px 0;
-        border-radius: 10px;
-        color: var(--text-muted);
-        font-size: 14px;
-        cursor: pointer;
-        transition: background 0.15s, color 0.15s;
-      }
-      .nav-item span.icon {
-        width: 18px;
-        text-align: center;
-        font-size: 14px;
-      }
-      .nav-item.active {
-        background: var(--accent-soft);
-        color: var(--text-main);
-      }
-      .nav-item:hover:not(.active) {
-        background: rgba(15, 23, 42, 0.9);
-        color: #e5e7eb;
-      }
-      .sidebar-footer {
-        margin-top: auto;
-        padding-top: 16px;
-        border-top: 1px solid var(--border-subtle);
-        font-size: 12px;
-        color: var(--text-muted);
-      }
-      .sidebar-footer strong {
-        color: var(--text-main);
+        margin: 14px 6px 6px;
       }
 
+      .nav-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .nav-item {
+        padding: 8px 10px;
+        border-radius: 8px;
+        margin: 2px 0;
+        cursor: pointer;
+        font-size: 14px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-item span.icon {
+        font-size: 14px;
+      }
+
+      .nav-item.active {
+        background: var(--primary-soft);
+        color: var(--text);
+      }
+
+      .nav-item:hover {
+        background: rgba(148, 163, 184, 0.08);
+      }
+
+      .sidebar-footer {
+        margin-top: auto;
+        font-size: 11px;
+        color: var(--text-muted);
+        opacity: 0.8;
+      }
+
+      /* Main */
       .main {
         flex: 1;
-        padding: 20px 26px 28px;
+        padding: 16px 24px 32px;
         display: flex;
         flex-direction: column;
-        gap: 16px;
       }
-      .main-header {
+
+      .topbar {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: 18px;
       }
-      .title-block h1 {
+
+      .topbar-left h1 {
+        font-size: 18px;
         margin: 0;
-        font-size: 22px;
       }
-      .title-block p {
-        margin: 4px 0 0;
+
+      .topbar-left p {
+        margin: 3px 0 0;
         font-size: 13px;
         color: var(--text-muted);
       }
-      .tag-beta {
-        font-size: 11px;
-        padding: 2px 8px;
-        border-radius: 999px;
-        background: rgba(34, 197, 94, 0.12);
-        border: 1px solid rgba(34, 197, 94, 0.4);
-        color: #bbf7d0;
-        margin-left: 10px;
+
+      .topbar-right {
+        font-size: 12px;
+        color: var(--text-muted);
       }
 
-      .view {
-        display: none;
-      }
-      .view.active {
-        display: block;
-      }
-
+      /* Cards */
       .card-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 14px;
       }
+
       .card {
-        background: var(--bg-card);
-        border-radius: 18px;
-        padding: 16px 18px;
+        background: linear-gradient(135deg, #020617, #020617);
+        border-radius: 16px;
         border: 1px solid var(--border-subtle);
-        box-shadow: 0 18px 45px rgba(15, 23, 42, 0.8);
+        padding: 14px 16px;
       }
+
       .card h3 {
-        margin: 0 0 6px;
+        margin: 0;
         font-size: 14px;
-        color: var(--text-muted);
-        font-weight: 500;
       }
+
+      .card-sub {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+
       .card-big-number {
+        margin-top: 8px;
         font-size: 28px;
         font-weight: 600;
       }
-      .card-sub {
-        font-size: 12px;
-        color: var(--text-muted);
-      }
-      .pill-soft {
+
+      .chip {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        padding: 2px 8px;
+        gap: 5px;
         border-radius: 999px;
+        padding: 2px 9px;
         font-size: 11px;
-        background: rgba(22, 163, 74, 0.12);
+        background: rgba(148, 163, 184, 0.1);
+      }
+
+      .chip.green {
+        background: rgba(34, 197, 94, 0.12);
         color: #bbf7d0;
+      }
+
+      .chip.red {
+        background: rgba(248, 113, 113, 0.12);
+        color: #fecaca;
+      }
+
+      .chip.blue {
+        background: rgba(59, 130, 246, 0.12);
+        color: #bfdbfe;
       }
 
       .section-row {
         display: grid;
-        grid-template-columns: 2.2fr 1.4fr;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
         gap: 14px;
-        margin-top: 8px;
       }
 
+      /* Tables */
       table {
         width: 100%;
         border-collapse: collapse;
         font-size: 13px;
       }
+
       th,
       td {
-        padding: 8px 6px;
-        border-bottom: 1px solid #111827;
+        padding: 8px 8px;
         text-align: left;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.9);
       }
+
       th {
-        color: var(--text-muted);
-        font-weight: 500;
-        font-size: 12px;
-      }
-      .status-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 999px;
-        background: #22c55e;
-        display: inline-block;
-        margin-right: 6px;
-      }
-      .badge {
         font-size: 11px;
-        padding: 2px 6px;
-        border-radius: 999px;
-        border: 1px solid var(--border-subtle);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
         color: var(--text-muted);
       }
-      .badge.orange {
-        border-color: #f97316;
-        color: #fed7aa;
-        background: rgba(248, 113, 113, 0.04);
+
+      tr:hover td {
+        background: rgba(15, 23, 42, 0.7);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--positive);
+        display: inline-block;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      /* Forms & buttons */
+      .form {
+        display: grid;
+        gap: 12px;
+        max-width: 560px;
       }
 
       .form-group {
-        margin-bottom: 10px;
-      }
-      .form-group label {
-        display: block;
-        font-size: 13px;
-        color: var(--text-muted);
-        margin-bottom: 4px;
-      }
-      .input,
-      textarea {
-        width: 100%;
-        padding: 8px 10px;
-        border-radius: 10px;
-        border: 1px solid #1f2937;
-        background: #020617;
-        color: var(--text-main);
-        font-size: 14px;
-      }
-      textarea {
-        min-height: 80px;
-        resize: vertical;
-      }
-      .btn-primary {
-        padding: 8px 16px;
-        border-radius: 999px;
-        border: none;
-        background: var(--accent);
-        color: white;
-        font-size: 14px;
-        cursor: pointer;
-      }
-      .btn-primary:hover {
-        background: #6366f1;
-      }
-      .integration-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 14px;
-      }
-      .integration-card h3 {
-        margin: 0 0 4px;
-      }
-      .integration-card p {
-        margin: 0 0 10px;
-        font-size: 13px;
-        color: var(--text-muted);
-      }
-      .btn-outline {
-        padding: 6px 12px;
-        border-radius: 999px;
-        border: 1px solid #374151;
-        background: transparent;
-        color: #e5e7eb;
-        font-size: 13px;
-        cursor: pointer;
-      }
-      .btn-outline:hover {
-        border-color: var(--accent);
-      }
-      .leaderboard-row-name {
         display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .avatar {
-        width: 22px;
-        height: 22px;
-        border-radius: 999px;
-        background: #111827;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-        color: var(--text-muted);
+        flex-direction: column;
+        gap: 5px;
       }
 
-      @media (max-width: 900px) {
-        .layout {
-          flex-direction: column;
-        }
-        .sidebar {
-          width: 100%;
-          flex-direction: row;
-          overflow-x: auto;
-          padding: 10px 12px;
-        }
-        .sidebar-footer {
-          display: none;
-        }
-        .nav-section-title {
-          display: none;
-        }
-        .main {
-          padding: 14px 14px 22px;
-        }
+      label {
+        font-size: 13px;
+      }
+
+      input[type="text"],
+      textarea {
+        border-radius: 10px;
+        border: 1px solid var(--border-subtle);
+        padding: 8px 10px;
+        font-size: 13px;
+        background: rgba(15, 23, 42, 0.9);
+        color: var(--text);
+        resize: vertical;
+        min-height: 36px;
+      }
+
+      textarea {
+        min-height: 80px;
+      }
+
+      input[type="file"] {
+        font-size: 13px;
+      }
+
+      button,
+      .btn {
+        border-radius: 999px;
+        border: none;
+        padding: 7px 14px;
+        font-size: 13px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: var(--text-muted);
+        border: 1px solid var(--border-subtle);
+      }
+
+      .btn-primary:hover {
+        filter: brightness(1.05);
+      }
+
+      .btn-outline:hover {
+        background: rgba(15, 23, 42, 0.8);
+      }
+
+      /* View container */
+      .view {
+        display: none;
+      }
+
+      .view.active {
+        display: block;
+      }
+
+      /* Timeline */
+      .timeline-pill {
+        border-radius: 999px;
+        padding: 4px 10px;
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .timeline-pill span {
+        margin-right: 6px;
+      }
+
+      /* Lists */
+      ul {
+        margin: 6px 0 0;
+      }
+
+      ul li {
+        margin-bottom: 4px;
       }
     </style>
   </head>
   <body>
-    <div class="layout">
+    <div class="app-shell">
       <!-- SIDEBAR -->
       <aside class="sidebar">
-        <div>
-          <div class="logo">
-            <div class="logo-icon">S</div>
-            <div class="logo-text">SalesAI Coach</div>
-          </div>
-
-          <div class="nav-section-title">Overview</div>
-          <div class="nav-item active" data-view="dashboard">
-            <span class="icon">📊</span>
-            <span>Dashboard</span>
-          </div>
-          <div class="nav-item" data-view="analyze">
-            <span class="icon">🧠</span>
-            <span>Analyze Call</span>
-          </div>
-          <div class="nav-item" data-view="recordings">
-            <span class="icon">📞</span>
-            <span>All Recordings</span>
-          </div>
-
-          <div class="nav-section-title">Coaching</div>
-          <div class="nav-item" data-view="team">
-            <span class="icon">🏅</span>
-            <span>Team Performance</span>
-          </div>
-          <div class="nav-item" data-view="scripts">
-            <span class="icon">📜</span>
-            <span>Call Scripts</span>
-          </div>
-
-          <div class="nav-section-title">System</div>
-          <div class="nav-item" data-view="integrations">
-            <span class="icon">⚙️</span>
-            <span>Integrations</span>
-          </div>
+        <div class="logo">
+          <div class="logo-mark">S</div>
+          <div class="logo-text">SalesAI Coach</div>
         </div>
+
+        <div class="nav-section-title">Overview</div>
+        <ul class="nav-list">
+          <li
+            class="nav-item active"
+            data-view="view-dashboard"
+            onclick="setView(this)"
+          >
+            <span class="icon">📊</span> Dashboard
+          </li>
+          <li
+            class="nav-item"
+            data-view="view-analyze"
+            onclick="setView(this)"
+          >
+            <span class="icon">🎧</span> Analyze Call
+          </li>
+          <li
+            class="nav-item"
+            data-view="view-recordings"
+            onclick="setView(this)"
+          >
+            <span class="icon">📁</span> All Recordings
+          </li>
+        </ul>
+
+        <div class="nav-section-title">Coaching</div>
+        <ul class="nav-list">
+          <li
+            class="nav-item"
+            data-view="view-team"
+            onclick="setView(this)"
+          >
+            <span class="icon">🏆</span> Team Performance
+          </li>
+          <li
+            class="nav-item"
+            data-view="view-scripts"
+            onclick="setView(this)"
+          >
+            <span class="icon">📜</span> Call Scripts
+          </li>
+        </ul>
+
+        <div class="nav-section-title">System</div>
+        <ul class="nav-list">
+          <li
+            class="nav-item"
+            data-view="view-integrations"
+            onclick="setView(this)"
+          >
+            <span class="icon">🔌</span> Integrations
+          </li>
+        </ul>
 
         <div class="sidebar-footer">
           Logged in as <strong>Admin</strong><br />
-          <span style="font-size: 11px; color: #6b7280"
-            >Prototype – data resets when server restarts</span
-          >
+          Prototype – data resets when server restarts.
         </div>
       </aside>
 
-      <!-- MAIN CONTENT -->
+      <!-- MAIN -->
       <main class="main">
-        <div class="main-header">
-          <div class="title-block">
+        <header class="topbar">
+          <div class="topbar-left">
             <h1 id="view-title">Dashboard</h1>
             <p id="view-subtitle">
               Overview of team performance and call metrics.
-              <span class="tag-beta">Internal prototype</span>
             </p>
           </div>
-        </div>
+          <div class="topbar-right">
+            CallCoach AI •
+            <span id="call-count-label">0 calls analyzed</span>
+          </div>
+        </header>
 
-        <!-- DASHBOARD VIEW -->
+        <!-- DASHBOARD -->
         <section id="view-dashboard" class="view active">
           <div class="card-grid">
             <div class="card">
-              <h3>Total Calls Analyzed</h3>
-              <div class="card-big-number" id="stat-total-calls">0</div>
-              <div class="card-sub">vs. last week</div>
-            </div>
-            <div class="card">
-              <h3>Appointment Rate</h3>
-              <div class="card-big-number" id="stat-appointment-rate">
-                0%
-              </div>
-              <div class="card-sub">
-                <span class="pill-soft">AI-detected bookings</span>
+              <div class="card-sub">Total Calls Analyzed</div>
+              <div class="card-big-number" id="dash-total-calls">0</div>
+              <div class="chip green" id="dash-change-label">
+                +0 vs last period
               </div>
             </div>
             <div class="card">
-              <h3>Avg Call Score</h3>
-              <div class="card-big-number" id="stat-avg-score">—</div>
-              <div class="card-sub">
-                <span class="pill-soft" id="stat-score-trend"
-                  >Avg script adherence —</span
-                >
+              <div class="card-sub">Appointment Rate</div>
+              <div class="card-big-number" id="dash-appt-rate">0%</div>
+              <div style="font-size: 12px; color: var(--text-muted)">
+                Based on calls with outcome <strong>Booked</strong>.
               </div>
             </div>
-          </div>
-
-          <div class="section-row">
             <div class="card">
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                "
-              >
-                <h3 style="margin-bottom: 0">Call Volume & Score</h3>
-                <span class="badge">Last 7 days (from uploads)</span>
-              </div>
-              <canvas id="chart-volume" height="120"></canvas>
-            </div>
-            <div class="card">
-              <h3>Agent Leaderboard</h3>
-              <table id="leaderboard-table">
-                <thead>
-                  <tr>
-                    <th>Agent</th>
-                    <th>Avg Score</th>
-                    <th>Calls</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
+              <div class="card-sub">Avg Call Quality Score</div>
+              <div class="card-big-number" id="dash-avg-score">0</div>
+              <div class="chip blue" id="dash-score-trend">–</div>
             </div>
           </div>
         </section>
 
-        <!-- ANALYZE CALL VIEW -->
+        <!-- ANALYZE CALL -->
         <section id="view-analyze" class="view">
-          <div class="card" style="max-width: 700px">
+          <div class="card">
             <h3>Upload & Analyze Call</h3>
-            <form action="/upload" method="POST" enctype="multipart/form-data">
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px">
+              Upload a call recording and optionally paste the transcript from
+              Yeastar / Google Meet. AI will generate a coaching report.
+            </p>
+
+            <form
+              class="form"
+              style="margin-top: 14px"
+              action="/upload"
+              method="post"
+              enctype="multipart/form-data"
+            >
               <div class="form-group">
-                <label>Agent name</label>
+                <label>Agent Name</label>
                 <input
-                  class="input"
                   type="text"
                   name="agentName"
                   placeholder="e.g. Tim, Wan Li"
                 />
               </div>
               <div class="form-group">
-                <label>Notes (client, objections, etc.)</label>
+                <label>Notes (summary, context)</label>
                 <textarea
                   name="notes"
-                  placeholder="e.g. Client was interested but price-sensitive..."
+                  placeholder="e.g. Client is a clinic, interested in SEO but price-sensitive..."
                 ></textarea>
               </div>
               <div class="form-group">
-                <label>Audio file (MP3/WAV)</label>
+                <label>Transcript (optional)</label>
+                <textarea
+                  name="transcript"
+                  placeholder="Paste full transcript here for deeper analysis..."
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label>Audio file</label>
                 <input type="file" name="audio" accept="audio/*" required />
               </div>
-              <button class="btn-primary" type="submit">
-                Upload & Analyze
-              </button>
+              <div>
+                <button type="submit" class="btn-primary">
+                  Upload & Analyze
+                </button>
+              </div>
             </form>
           </div>
         </section>
 
-        <!-- ALL RECORDINGS VIEW -->
+        <!-- ALL RECORDINGS -->
         <section id="view-recordings" class="view">
           <div class="card">
             <h3>All Recordings</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Status</th>
-                  <th>Agent</th>
-                  <th>Recording Name</th>
-                  <th>Date &amp; Time</th>
-                  <th>Score</th>
-                  <th>Appointment</th>
-                  <th>Script Adh</th>
-                  <th>Sentiment</th>
-                </tr>
-              </thead>
-              <tbody id="recordings-body"></tbody>
-            </table>
-          </div>
-        </section>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px">
+              History of analyzed calls and coaching reports.
+            </p>
 
-        <!-- TEAM PERFORMANCE VIEW -->
-        <section id="view-team" class="view">
-          <div class="section-row">
-            <div class="card">
-              <h3>Team Performance</h3>
-              <p style="margin-top: 0; font-size: 13px; color: var(--text-muted)">
-                Agent leaderboard and aggregate coaching metrics based on AI
-                analysis.
-              </p>
+            <div style="margin-top: 12px; overflow-x: auto">
               <table>
                 <thead>
                   <tr>
+                    <th></th>
                     <th>Agent</th>
-                    <th>Avg Score</th>
-                    <th>Calls</th>
-                    <th>Appt Rate</th>
+                    <th>File</th>
+                    <th>Date &amp; Time</th>
+                    <th>Score</th>
+                    <th>Outcome</th>
+                    <th>Script Adh.</th>
+                    <th>Sentiment</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody id="team-table-body"></tbody>
+                <tbody id="recordings-body"></tbody>
               </table>
             </div>
-            <div class="card">
-              <h3>Coaching Focus</h3>
-              <p
-                id="coaching-focus"
-                style="font-size: 13px; color: var(--text-muted)"
-              >
-                Upload more calls to see patterns in objection handling,
-                closing, and discovery.
-              </p>
+          </div>
+        </section>
+
+        <!-- REPORT VIEW -->
+        <section id="view-report" class="view">
+          <div class="card">
+            <button class="btn-outline" onclick="backToRecordings()">
+              ← Back to Recordings
+            </button>
+            <h3 id="report-file-title" style="margin-top: 12px">
+              Analysis Results
+            </h3>
+            <p
+              id="report-file-sub"
+              style="font-size: 13px; color: var(--text-muted); margin-top: 2px"
+            ></p>
+
+            <div class="card-grid" style="margin-top: 14px">
+              <div class="card">
+                <h3>Call Quality Score</h3>
+                <div class="card-big-number" id="report-score">—</div>
+                <div style="display: flex; gap: 10px; margin-top: 8px">
+                  <div>
+                    <div class="card-sub">Sentiment</div>
+                    <div id="report-sentiment">—</div>
+                  </div>
+                  <div>
+                    <div class="card-sub">Conversion Likelihood</div>
+                    <div id="report-conversion">—</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <h3>Script Adherence</h3>
+                <div
+                  id="report-script-bar"
+                  style="
+                    margin-top: 10px;
+                    width: 100%;
+                    height: 8px;
+                    background: #020617;
+                    border-radius: 999px;
+                    overflow: hidden;
+                  "
+                >
+                  <div
+                    id="report-script-fill"
+                    style="height: 8px; width: 0; background: var(--primary)"
+                  ></div>
+                </div>
+                <div
+                  id="report-script-text"
+                  style="
+                    margin-top: 6px;
+                    font-size: 13px;
+                    color: var(--text-muted);
+                  "
+                ></div>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top: 14px">
+              <h3>Call Timeline</h3>
+              <div
+                id="report-timeline"
+                style="
+                  display: flex;
+                  gap: 10px;
+                  margin-top: 10px;
+                  flex-wrap: wrap;
+                  font-size: 13px;
+                  color: var(--text-muted);
+                "
+              ></div>
+            </div>
+
+            <div class="section-row" style="margin-top: 14px">
+              <div class="card">
+                <h3>Key Objections Raised</h3>
+                <ul
+                  id="report-objections"
+                  style="
+                    font-size: 13px;
+                    color: var(--text-muted);
+                    padding-left: 18px;
+                  "
+                ></ul>
+              </div>
+              <div class="card">
+                <h3>Coaching Plan</h3>
+                <ul
+                  id="report-coaching"
+                  style="
+                    font-size: 13px;
+                    color: var(--text-muted);
+                    padding-left: 18px;
+                  "
+                ></ul>
+              </div>
+            </div>
+
+            <div class="section-row" style="margin-top: 14px">
+              <div class="card">
+                <h3>What to Keep / Add</h3>
+                <ul
+                  id="report-strengths"
+                  style="
+                    font-size: 13px;
+                    color: var(--text-muted);
+                    padding-left: 18px;
+                  "
+                ></ul>
+                <h4 style="margin-top: 10px; font-size: 13px">
+                  Recommended phrases
+                </h4>
+                <ul
+                  id="report-phrases-add"
+                  style="
+                    font-size: 13px;
+                    color: var(--text-muted);
+                    padding-left: 18px;
+                  "
+                ></ul>
+              </div>
+              <div class="card">
+                <h3>What to Remove / Avoid</h3>
+                <ul
+                  id="report-improvements"
+                  style="
+                    font-size: 13px;
+                    color: var(--text-muted);
+                    padding-left: 18px;
+                  "
+                ></ul>
+                <h4 style="margin-top: 10px; font-size: 13px">
+                  Phrases to avoid
+                </h4>
+                <ul
+                  id="report-phrases-avoid"
+                  style="
+                    font-size: 13px;
+                    color: var(--text-muted);
+                    padding-left: 18px;
+                  "
+                ></ul>
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- CALL SCRIPTS VIEW (placeholder for now) -->
-        <section id="view-scripts" class="view">
+        <!-- TEAM PERFORMANCE (placeholder – will hook later) -->
+        <section id="view-team" class="view">
           <div class="card">
-            <h3>Sales Playbooks</h3>
-            <p style="font-size: 13px; color: var(--text-muted)">
-              Later, this section will hold your outbound / inbound call
-              scripts so AI can measure adherence.
+            <h3>Team Performance</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px">
+              Summary of agent scores based on analyzed calls.
             </p>
-            <ul style="font-size: 13px; color: var(--text-muted); padding-left: 18px;">
-              <li>Outbound Cold Call – Version 1.0</li>
-              <li>Clinic Appointment Reminder Script</li>
-              <li>Finance Lead Discovery Flow</li>
-            </ul>
+            <div id="team-performance-body" style="margin-top: 10px"></div>
           </div>
         </section>
 
-        <!-- INTEGRATIONS VIEW -->
+        <!-- CALL SCRIPTS (placeholder for now) -->
+        <section id="view-scripts" class="view">
+          <div class="card">
+            <h3>Call Scripts</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px">
+              Later we will store your outbound / reminder scripts here and use
+              them for strict script adherence scoring.
+            </p>
+          </div>
+        </section>
+
+        <!-- INTEGRATIONS (placeholder) -->
         <section id="view-integrations" class="view">
           <div class="card">
             <h3>Integrations</h3>
-            <p style="font-size: 13px; color: var(--text-muted)">
-              Connect your voice providers and storage to automate call
-              ingestion. (UI only for now.)
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px">
+              Future: Yeastar PBX, Google Meet, Google Drive – to pull
+              recordings & transcripts automatically.
             </p>
-            <div class="integration-grid">
-              <div class="card integration-card">
-                <h3>Yeastar PBX</h3>
-                <p>
-                  Sync call recordings from your Yeastar cloud PBX and push
-                  them into SalesAI for analysis.
-                </p>
-                <button class="btn-outline">Connect</button>
-              </div>
-              <div class="card integration-card">
-                <h3>Google Meet</h3>
-                <p>
-                  Import video meeting recordings &amp; transcripts from Google
-                  Workspace for AI coaching.
-                </p>
-                <button class="btn-outline">Connect</button>
-              </div>
-              <div class="card integration-card">
-                <h3>Google Drive</h3>
-                <p>
-                  Watch specific folders for new audio/video files to analyze
-                  automatically.
-                </p>
-                <button class="btn-outline">Connect</button>
-              </div>
-            </div>
           </div>
         </section>
       </main>
@@ -585,81 +723,97 @@
 
     <script>
       let calls = [];
-      let volumeChart;
 
-      // NAVIGATION
-      const viewTitles = {
-        dashboard: "Dashboard",
-        analyze: "Analyze Call",
-        recordings: "All Recordings",
-        team: "Team Performance",
-        scripts: "Call Scripts",
-        integrations: "Integrations",
-      };
-      const viewSubtitles = {
-        dashboard: "Overview of team performance and call metrics.",
-        analyze: "Upload recordings and send them for analysis.",
-        recordings: "History of analyzed calls and coaching reports.",
-        team: "Agent leaderboard and aggregate coaching metrics.",
-        scripts: "Manage sales playbooks used to score adherence.",
-        integrations:
-          "Connect Yeastar, Google Meet, and storage for automated ingestion.",
-      };
-
-      document
-        .querySelectorAll(".nav-item")
-        .forEach((item) =>
-          item.addEventListener("click", () => switchView(item))
-        );
-
-      function switchView(item) {
-        const view = item.getAttribute("data-view");
+      function setView(navItem) {
         document
           .querySelectorAll(".nav-item")
           .forEach((n) => n.classList.remove("active"));
-        item.classList.add("active");
+        navItem.classList.add("active");
 
+        const viewId = navItem.getAttribute("data-view");
         document
           .querySelectorAll(".view")
           .forEach((v) => v.classList.remove("active"));
-        document
-          .getElementById(`view-${view}`)
-          .classList.add("active");
+        document.getElementById(viewId).classList.add("active");
 
-        document.getElementById("view-title").textContent =
-          viewTitles[view];
-        document.getElementById("view-subtitle").textContent =
-          viewSubtitles[view];
+        // Update header text
+        switch (viewId) {
+          case "view-dashboard":
+            document.getElementById("view-title").textContent = "Dashboard";
+            document.getElementById("view-subtitle").textContent =
+              "Overview of team performance and call metrics.";
+            break;
+          case "view-analyze":
+            document.getElementById("view-title").textContent =
+              "Analyze Call";
+            document.getElementById("view-subtitle").textContent =
+              "Upload a call recording and let AI generate a coaching report.";
+            break;
+          case "view-recordings":
+            document.getElementById("view-title").textContent =
+              "All Recordings";
+            document.getElementById("view-subtitle").textContent =
+              "History of analyzed calls and coaching reports.";
+            break;
+          case "view-team":
+            document.getElementById("view-title").textContent =
+              "Team Performance";
+            document.getElementById("view-subtitle").textContent =
+              "Agent leaderboard based on call quality and adherence.";
+            break;
+          case "view-scripts":
+            document.getElementById("view-title").textContent =
+              "Call Scripts";
+            document.getElementById("view-subtitle").textContent =
+              "Manage scripts that AI uses to measure adherence.";
+            break;
+          case "view-integrations":
+            document.getElementById("view-title").textContent =
+              "Integrations";
+            document.getElementById("view-subtitle").textContent =
+              "Connect Yeastar, Meet and Drive to ingest calls automatically.";
+            break;
+        }
       }
 
-      // DATA FETCH + RENDER
       async function loadCalls() {
         try {
           const res = await fetch("/api/calls");
-          calls = await res.json();
+          const data = await res.json();
+          calls = data || [];
+
+          document.getElementById("call-count-label").textContent =
+            calls.length + " calls analyzed";
+
           renderRecordings();
           renderDashboard();
-          renderTeamView();
+          renderTeamPerformance();
         } catch (e) {
           console.error("Failed to load calls", e);
         }
       }
 
       function renderRecordings() {
-        const body = document.getElementById("recordings-body");
-        body.innerHTML = "";
+        const tbody = document.getElementById("recordings-body");
+        tbody.innerHTML = "";
 
         if (!calls.length) {
-          body.innerHTML =
-            '<tr><td colspan="8" style="padding:14px;color:#6b7280;">No calls yet. Upload a recording to see it here.</td></tr>';
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          td.colSpan = 9;
+          td.textContent = "No calls analyzed yet.";
+          td.style.color = "var(--text-muted)";
+          tr.appendChild(td);
+          tbody.appendChild(tr);
           return;
         }
 
         calls.forEach((c) => {
-          const scriptAdhPercent = c.scriptAdherence
+          const tr = document.createElement("tr");
+          const adhPct = c.scriptAdherence
             ? Math.round(c.scriptAdherence * 100)
             : 0;
-          const tr = document.createElement("tr");
+
           tr.innerHTML = `
             <td><span class="status-dot"></span></td>
             <td>${c.agentName}</td>
@@ -667,232 +821,187 @@
             <td>${new Date(c.createdAt).toLocaleString()}</td>
             <td><span class="badge">${c.qualityScore ?? "—"}</span></td>
             <td>${c.appointmentOutcome || "—"}</td>
-            <td>${scriptAdhPercent || 0}%</td>
+            <td>${adhPct}%</td>
             <td>${c.sentiment || "—"}</td>
+            <td>
+              <button class="btn-outline" onclick="openReport(${
+                c.id
+              })">View report</button>
+            </td>
           `;
-          body.appendChild(tr);
+          tbody.appendChild(tr);
         });
-      }
-
-      function groupByAgent() {
-        const byAgent = {};
-        calls.forEach((c) => {
-          const name = c.agentName || "Unknown";
-          if (!byAgent[name]) {
-            byAgent[name] = {
-              totalScore: 0,
-              totalScriptAdh: 0,
-              count: 0,
-              booked: 0,
-            };
-          }
-          const score =
-            typeof c.qualityScore === "number" ? c.qualityScore : 0;
-          const scriptAdh =
-            typeof c.scriptAdherence === "number" ? c.scriptAdherence : 0;
-          byAgent[name].totalScore += score;
-          byAgent[name].totalScriptAdh += scriptAdh;
-          byAgent[name].count += 1;
-          if (c.appointmentOutcome === "Booked") {
-            byAgent[name].booked += 1;
-          }
-        });
-        return byAgent;
       }
 
       function renderDashboard() {
         const total = calls.length;
-        document.getElementById("stat-total-calls").textContent = total;
+        document.getElementById("dash-total-calls").textContent = total;
 
-        // Appointment rate = % of calls with outcome = Booked
+        if (!total) {
+          document.getElementById("dash-appt-rate").textContent = "0%";
+          document.getElementById("dash-avg-score").textContent = "0";
+          return;
+        }
+
         const booked = calls.filter(
           (c) => c.appointmentOutcome === "Booked"
         ).length;
-        const appointmentRate = total ? (booked / total) * 100 : 0;
-        document.getElementById(
-          "stat-appointment-rate"
-        ).textContent = `${appointmentRate.toFixed(1)}%`;
+        const rate = Math.round((booked / total) * 100);
+        const avgScore =
+          Math.round(
+            (calls.reduce((sum, c) => sum + (c.qualityScore || 0), 0) /
+              total) *
+              10
+          ) / 10;
 
-        // Avg score & avg script adherence
-        let avgScore = 0;
-        let avgScriptAdh = 0;
-        if (total) {
-          avgScore =
-            calls.reduce(
-              (sum, c) => sum + (c.qualityScore || 0),
-              0
-            ) / total;
-          avgScriptAdh =
-            calls.reduce(
-              (sum, c) => sum + (c.scriptAdherence || 0),
-              0
-            ) / total;
-        }
-        document.getElementById("stat-avg-score").textContent = total
-          ? avgScore.toFixed(1)
-          : "—";
-        document.getElementById("stat-score-trend").textContent =
-          total && avgScriptAdh
-            ? `Avg script adherence ${(avgScriptAdh * 100).toFixed(0)}%`
-            : "Avg script adherence —";
-
-        // Leaderboard table
-        const byAgent = groupByAgent();
-        const rows = Object.entries(byAgent).map(
-          ([name, v]) => ({
-            name,
-            avgScore: v.totalScore / v.count,
-            count: v.count,
-          })
-        );
-        rows.sort((a, b) => b.avgScore - a.avgScore);
-
-        const lbBody = document.querySelector(
-          "#leaderboard-table tbody"
-        );
-        lbBody.innerHTML = "";
-        rows.forEach((r) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td class="leaderboard-row-name">
-              <span class="avatar">${r.name
-                .slice(0, 2)
-                .toUpperCase()}</span>
-              <span>${r.name}</span>
-            </td>
-            <td>${r.avgScore.toFixed(1)}</td>
-            <td>${r.count}</td>
-          `;
-          lbBody.appendChild(tr);
-        });
-
-        renderVolumeChart();
+        document.getElementById("dash-appt-rate").textContent =
+          rate + "%";
+        document.getElementById("dash-avg-score").textContent =
+          avgScore || 0;
       }
 
-      function renderTeamView() {
-        const byAgent = groupByAgent();
-        const rows = Object.entries(byAgent).map(
-          ([name, v]) => ({
-            name,
-            avgScore: v.totalScore / v.count,
-            count: v.count,
-            apptRate: v.count ? v.booked / v.count : 0,
-            scriptAdh: v.count ? v.totalScriptAdh / v.count : 0,
-          })
-        );
-        rows.sort((a, b) => b.avgScore - a.avgScore);
+      function renderTeamPerformance() {
+        const container = document.getElementById("team-performance-body");
+        container.innerHTML = "";
 
-        const tb = document.getElementById("team-table-body");
-        tb.innerHTML = "";
-        rows.forEach((r) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td class="leaderboard-row-name">
-              <span class="avatar">${r.name
-                .slice(0, 2)
-                .toUpperCase()}</span>
-              <span>${r.name}</span>
-            </td>
-            <td>${r.avgScore.toFixed(1)}</td>
-            <td>${r.count}</td>
-            <td>${(r.apptRate * 100).toFixed(0)}%</td>
-          `;
-          tb.appendChild(tr);
-        });
-
-        const focus = document.getElementById("coaching-focus");
-        if (!rows.length) {
-          focus.textContent =
-            "Upload more calls to see coaching focus by agent.";
-        } else {
-          const lowest = rows[rows.length - 1];
-          focus.textContent = `Early signal: ${
-            lowest.name
-          } has the lowest average score (${lowest.avgScore.toFixed(
-            1
-          )}) and appointment rate of ${(lowest.apptRate * 100).toFixed(
-            0
-          )}%. Focus coaching on discovery, objection handling, and closing for this agent.`;
+        if (!calls.length) {
+          container.style.fontSize = "13px";
+          container.style.color = "var(--text-muted)";
+          container.textContent =
+            "Run a few analyses first – team stats will appear here.";
+          return;
         }
-      }
 
-      function renderVolumeChart() {
-        const ctx = document.getElementById("chart-volume").getContext(
-          "2d"
-        );
-
-        const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        const counts = [0, 0, 0, 0, 0, 0, 0];
-        const scores = [0, 0, 0, 0, 0, 0, 0];
-
+        const byAgent = {};
         calls.forEach((c) => {
-          const d = new Date(c.createdAt);
-          const idx = d.getDay(); // 0 = Sun
-          const mapped = idx === 0 ? 6 : idx - 1; // Mon=0
-          counts[mapped] += 1;
-          scores[mapped] += c.qualityScore || 0;
+          if (!byAgent[c.agentName]) {
+            byAgent[c.agentName] = { count: 0, scoreSum: 0 };
+          }
+          byAgent[c.agentName].count += 1;
+          byAgent[c.agentName].scoreSum += c.qualityScore || 0;
         });
 
-        const avgScores = counts.map((n, i) =>
-          n ? scores[i] / n : 0
-        );
+        const list = Object.entries(byAgent)
+          .map(([name, v]) => ({
+            name,
+            avg: Math.round((v.scoreSum / v.count) * 10) / 10,
+            count: v.count,
+          }))
+          .sort((a, b) => b.avg - a.avg);
 
-        if (volumeChart) volumeChart.destroy();
-
-        volumeChart = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: days,
-            datasets: [
-              {
-                label: "Calls",
-                data: counts,
-                yAxisID: "y",
-                tension: 0.35,
-                borderColor: "rgba(96, 165, 250, 1)",
-                backgroundColor: "rgba(96, 165, 250, 0.2)",
-                fill: true,
-              },
-              {
-                label: "Avg Score",
-                data: avgScores,
-                yAxisID: "y1",
-                tension: 0.35,
-                borderColor: "rgba(129, 140, 248, 1)",
-                backgroundColor: "rgba(129, 140, 248, 0.1)",
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: { color: "#6b7280" },
-                grid: { color: "#111827" },
-              },
-              y1: {
-                position: "right",
-                beginAtZero: true,
-                min: 0,
-                max: 100,
-                ticks: { color: "#6b7280" },
-                grid: { display: false },
-              },
-              x: {
-                ticks: { color: "#6b7280" },
-                grid: { color: "#111827" },
-              },
-            },
-            plugins: {
-              legend: {
-                labels: { color: "#9ca3af", boxWidth: 12 },
-              },
-            },
-          },
-        });
+        const table = document.createElement("table");
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Agent</th>
+              <th>Avg Score</th>
+              <th>Calls</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${list
+              .map(
+                (row) => `
+              <tr>
+                <td>${row.name}</td>
+                <td>${row.avg}</td>
+                <td>${row.count}</td>
+              </tr>
+            `
+              )
+              .join("")}
+          </tbody>
+        `;
+        container.appendChild(table);
       }
 
+      async function openReport(id) {
+        try {
+          const res = await fetch(`/api/calls/${id}`);
+          if (!res.ok) {
+            alert("Report not found");
+            return;
+          }
+          const c = await res.json();
+
+          // Switch view (no sidebar highlight change)
+          document
+            .querySelectorAll(".view")
+            .forEach((v) => v.classList.remove("active"));
+          document.getElementById("view-report").classList.add("active");
+
+          document.getElementById("view-title").textContent =
+            "Analysis Results";
+          document.getElementById("view-subtitle").textContent =
+            "Detailed AI breakdown of one call for coaching and script adherence.";
+
+          document.getElementById("report-file-title").textContent =
+            "Analysis Results – " + c.filename;
+          document.getElementById("report-file-sub").textContent =
+            c.agentName +
+            " • " +
+            new Date(c.createdAt).toLocaleString();
+
+          document.getElementById("report-score").textContent =
+            (c.qualityScore || 0) + "/100";
+          document.getElementById("report-sentiment").textContent =
+            c.sentiment || "—";
+          document.getElementById("report-conversion").textContent =
+            c.conversionLikelihood || "—";
+
+          const adhPct = c.scriptAdherence
+            ? Math.round(c.scriptAdherence * 100)
+            : 0;
+          document.getElementById("report-script-fill").style.width =
+            adhPct + "%";
+          document.getElementById("report-script-text").textContent =
+            "Estimated adherence to script: " + adhPct + "%";
+
+          const tl = document.getElementById("report-timeline");
+          tl.innerHTML = "";
+          (c.callTimeline || []).forEach((item) => {
+            const div = document.createElement("div");
+            div.className = "timeline-pill";
+            div.innerHTML = `<span class="badge">${item.label}</span> ${
+              item.description || ""
+            }`;
+            tl.appendChild(div);
+          });
+
+          const fillList = (id, items) => {
+            const el = document.getElementById(id);
+            el.innerHTML = "";
+            (items || []).forEach((txt) => {
+              const li = document.createElement("li");
+              li.textContent = txt;
+              el.appendChild(li);
+            });
+          };
+
+          fillList("report-objections", c.keyObjections);
+          fillList("report-coaching", c.coachingPlan);
+          fillList("report-strengths", c.strengths);
+          fillList("report-improvements", c.improvements);
+          fillList("report-phrases-add", c.recommendedPhrases);
+          fillList("report-phrases-avoid", c.phrasesToAvoid);
+        } catch (e) {
+          console.error(e);
+          alert("Failed to load report.");
+        }
+      }
+
+      function backToRecordings() {
+        document
+          .querySelectorAll(".view")
+          .forEach((v) => v.classList.remove("active"));
+        document.getElementById("view-recordings").classList.add("active");
+        document.getElementById("view-title").textContent =
+          "All Recordings";
+        document.getElementById("view-subtitle").textContent =
+          "History of analyzed calls and coaching reports.";
+      }
+
+      // Initial load
       loadCalls();
     </script>
   </body>
