@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <title>SalesAI CallCoach</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       :root {
@@ -178,10 +177,6 @@
         background: rgba(22, 163, 74, 0.12);
         color: #bbf7d0;
       }
-      .pill-soft.down {
-        background: rgba(220, 38, 38, 0.12);
-        color: #fecaca;
-      }
 
       .section-row {
         display: grid;
@@ -237,8 +232,7 @@
         margin-bottom: 4px;
       }
       .input,
-      textarea,
-      select {
+      textarea {
         width: 100%;
         padding: 8px 10px;
         border-radius: 10px;
@@ -402,15 +396,15 @@
                 0%
               </div>
               <div class="card-sub">
-                <span class="pill-soft">Simulated metric</span>
+                <span class="pill-soft">AI-detected bookings</span>
               </div>
             </div>
             <div class="card">
               <h3>Avg Call Score</h3>
               <div class="card-big-number" id="stat-avg-score">—</div>
               <div class="card-sub">
-                <span class="pill-soft down" id="stat-score-trend"
-                  >-0.0% vs last week</span
+                <span class="pill-soft" id="stat-score-trend"
+                  >Avg script adherence —</span
                 >
               </div>
             </div>
@@ -426,7 +420,7 @@
                 "
               >
                 <h3 style="margin-bottom: 0">Call Volume & Score</h3>
-                <span class="badge">Last 7 days (simulated)</span>
+                <span class="badge">Last 7 days (from uploads)</span>
               </div>
               <canvas id="chart-volume" height="120"></canvas>
             </div>
@@ -490,6 +484,8 @@
                   <th>Recording Name</th>
                   <th>Date &amp; Time</th>
                   <th>Score</th>
+                  <th>Appointment</th>
+                  <th>Script Adh</th>
                   <th>Sentiment</th>
                 </tr>
               </thead>
@@ -504,8 +500,8 @@
             <div class="card">
               <h3>Team Performance</h3>
               <p style="margin-top: 0; font-size: 13px; color: var(--text-muted)">
-                Agent leaderboard and aggregate coaching metrics (mocked for
-                now).
+                Agent leaderboard and aggregate coaching metrics based on AI
+                analysis.
               </p>
               <table>
                 <thead>
@@ -513,6 +509,7 @@
                     <th>Agent</th>
                     <th>Avg Score</th>
                     <th>Calls</th>
+                    <th>Appt Rate</th>
                   </tr>
                 </thead>
                 <tbody id="team-table-body"></tbody>
@@ -531,7 +528,7 @@
           </div>
         </section>
 
-        <!-- CALL SCRIPTS VIEW (placeholder) -->
+        <!-- CALL SCRIPTS VIEW (placeholder for now) -->
         <section id="view-scripts" class="view">
           <div class="card">
             <h3>Sales Playbooks</h3>
@@ -654,19 +651,24 @@
 
         if (!calls.length) {
           body.innerHTML =
-            '<tr><td colspan="6" style="padding:14px;color:#6b7280;">No calls yet. Upload a recording to see it here.</td></tr>';
+            '<tr><td colspan="8" style="padding:14px;color:#6b7280;">No calls yet. Upload a recording to see it here.</td></tr>';
           return;
         }
 
         calls.forEach((c) => {
+          const scriptAdhPercent = c.scriptAdherence
+            ? Math.round(c.scriptAdherence * 100)
+            : 0;
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td><span class="status-dot"></span></td>
             <td>${c.agentName}</td>
             <td>${c.filename}</td>
             <td>${new Date(c.createdAt).toLocaleString()}</td>
-            <td><span class="badge">${c.qualityScore}</span></td>
-            <td>${c.sentiment}</td>
+            <td><span class="badge">${c.qualityScore ?? "—"}</span></td>
+            <td>${c.appointmentOutcome || "—"}</td>
+            <td>${scriptAdhPercent || 0}%</td>
+            <td>${c.sentiment || "—"}</td>
           `;
           body.appendChild(tr);
         });
@@ -677,10 +679,23 @@
         calls.forEach((c) => {
           const name = c.agentName || "Unknown";
           if (!byAgent[name]) {
-            byAgent[name] = { totalScore: 0, count: 0 };
+            byAgent[name] = {
+              totalScore: 0,
+              totalScriptAdh: 0,
+              count: 0,
+              booked: 0,
+            };
           }
-          byAgent[name].totalScore += c.qualityScore || 0;
+          const score =
+            typeof c.qualityScore === "number" ? c.qualityScore : 0;
+          const scriptAdh =
+            typeof c.scriptAdherence === "number" ? c.scriptAdherence : 0;
+          byAgent[name].totalScore += score;
+          byAgent[name].totalScriptAdh += scriptAdh;
           byAgent[name].count += 1;
+          if (c.appointmentOutcome === "Booked") {
+            byAgent[name].booked += 1;
+          }
         });
         return byAgent;
       }
@@ -689,24 +704,37 @@
         const total = calls.length;
         document.getElementById("stat-total-calls").textContent = total;
 
-        // Fake appointment rate: assume 25% if there are calls
-        const appointmentRate = total ? 24.8 : 0;
+        // Appointment rate = % of calls with outcome = Booked
+        const booked = calls.filter(
+          (c) => c.appointmentOutcome === "Booked"
+        ).length;
+        const appointmentRate = total ? (booked / total) * 100 : 0;
         document.getElementById(
           "stat-appointment-rate"
         ).textContent = `${appointmentRate.toFixed(1)}%`;
 
-        // Avg score
+        // Avg score & avg script adherence
         let avgScore = 0;
+        let avgScriptAdh = 0;
         if (total) {
           avgScore =
             calls.reduce(
               (sum, c) => sum + (c.qualityScore || 0),
               0
             ) / total;
+          avgScriptAdh =
+            calls.reduce(
+              (sum, c) => sum + (c.scriptAdherence || 0),
+              0
+            ) / total;
         }
         document.getElementById("stat-avg-score").textContent = total
           ? avgScore.toFixed(1)
           : "—";
+        document.getElementById("stat-score-trend").textContent =
+          total && avgScriptAdh
+            ? `Avg script adherence ${(avgScriptAdh * 100).toFixed(0)}%`
+            : "Avg script adherence —";
 
         // Leaderboard table
         const byAgent = groupByAgent();
@@ -748,6 +776,8 @@
             name,
             avgScore: v.totalScore / v.count,
             count: v.count,
+            apptRate: v.count ? v.booked / v.count : 0,
+            scriptAdh: v.count ? v.totalScriptAdh / v.count : 0,
           })
         );
         rows.sort((a, b) => b.avgScore - a.avgScore);
@@ -765,6 +795,7 @@
             </td>
             <td>${r.avgScore.toFixed(1)}</td>
             <td>${r.count}</td>
+            <td>${(r.apptRate * 100).toFixed(0)}%</td>
           `;
           tb.appendChild(tr);
         });
@@ -779,7 +810,9 @@
             lowest.name
           } has the lowest average score (${lowest.avgScore.toFixed(
             1
-          )}). Focus coaching on objection handling and closing for this agent.`;
+          )}) and appointment rate of ${(lowest.apptRate * 100).toFixed(
+            0
+          )}%. Focus coaching on discovery, objection handling, and closing for this agent.`;
         }
       }
 
@@ -788,7 +821,6 @@
           "2d"
         );
 
-        // very simple "calls per day index" using createdAt weekday
         const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
         const counts = [0, 0, 0, 0, 0, 0, 0];
         const scores = [0, 0, 0, 0, 0, 0, 0];
