@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CallCoach AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; background: #0f172a; color: #e5e7eb; padding: 24px; }
+    h1 { margin-bottom: 6px; }
+    .container { max-width: 900px; margin: auto; }
+    .card { background: #1e293b; padding: 20px; border-radius: 10px; margin-bottom: 24px; }
+    label { display: block; margin-top: 10px; margin-bottom: 4px; }
+    input, textarea { width: 100%; padding: 10px; border-radius: 6px; border: none; margin-bottom: 10px; }
+    button { padding: 10px 20px; border-radius: 6px; border: none; background: #6366f1; color: white; cursor: pointer; }
+    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+    td, th { padding: 8px; border-bottom: 1px solid #334155; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CallCoach AI</h1>
+    <p>Upload a call recording and view basic analysis.</p>
+
+    <div class="card">
+      <h2>Upload Call</h2>
+      <form action="/upload" method="POST" enctype="multipart/form-data">
+        <label>Agent Name</label>
+        <input type="text" name="agentName" placeholder="e.g. Tim, Wan Li">
+
+        <label>Notes</label>
+        <textarea name="notes" rows="3" placeholder="Client context, objections, etc."></textarea>
+
+        <label>Audio File</label>
+        <input type="file" name="audio" accept="audio/*" required>
+
+        <button type="submit">Upload & Analyze</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Call History</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Agent</th>
+            <th>File</th>
+            <th>Time</th>
+            <th>Analysis</th>
+          </tr>
+        </thead>
+        <tbody id="calls-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function loadCalls() {
+      const res = await fetch("/api/calls");
+      const data = await res.json();
+      const body = document.getElementById("calls-body");
+      body.innerHTML = "";
+
+      data.forEach(call => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${call.id}</td>
+          <td>${call.agentName}</td>
+          <td>${call.filename}</td>
+          <td>${new Date(call.createdAt).toLocaleString()}</td>
+          <td>${call.analysis.replace(/\\n/g, "<br>")}</td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    loadCalls();
+  </script>
+</body>
+</html>
